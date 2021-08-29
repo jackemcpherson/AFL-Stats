@@ -7,38 +7,8 @@ def getFullPlayerStats(year):
     for x in player_stats[1:]:
         x["team"] = str(x.columns[0][0]).split(" [")[0]
         x.columns = x.columns.droplevel(0)
-        x.columns = [
-            "#",
-            "Player",
-            "GM",
-            "KI",
-            "MK",
-            "HB",
-            "DI",
-            "DA",
-            "GL",
-            "BH",
-            "HO",
-            "TK",
-            "RB",
-            "IF",
-            "CL",
-            "CG",
-            "FF",
-            "FA",
-            "BR",
-            "CP",
-            "UP",
-            "CM",
-            "MI",
-            "1%",
-            "BO",
-            "GA",
-            "%P",
-            "SU",
-            "Team",
-        ]
-        clean_dfs.append(x[:-1])
+        x = x.rename(columns={"": "Team"})[:-1]
+        clean_dfs.append(x)
     full_player_stats = (pd.concat(clean_dfs)).fillna(0).reset_index(drop=True)
     return full_player_stats
 
