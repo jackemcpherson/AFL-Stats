@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def getFullPlayerStats(year):
+def getFullPlayerStats(year: int):
     player_stats = pd.read_html(f"https://afltables.com/afl/stats/{year}.html")
     clean_dfs = []
     for x in player_stats[1:]:
@@ -13,7 +13,7 @@ def getFullPlayerStats(year):
     return full_player_stats
 
 
-def getPlayerRankings(year, include_full_stats=False):
+def getPlayerRankings(year: int, include_full_stats: bool = False):
     FPS = getFullPlayerStats(year)
     FPS["OFF_Score"] = (
         FPS["GL"] * 6
