@@ -49,6 +49,28 @@ def getAllResults():
     return full_results
 
 
+def getAllDOBAndDebuts(full_historical_data: bool = False):
+    # Returns a Dataframe containing all players by name, DOB, and debut date.
+    # Defaults to debuts after 2000 unless overridden using the full_historical_data flag.
+    df = pd.read_fwf(
+        "https://afltables.com/afl/stats/biglists/bg10.txt",
+        widths=[7, 29, 15, 6, 10, 15],
+        skiprows=1,
+    )
+    df.columns = ["Key", "Name", "DOB", "Round", "Home v Away", "Debut"]
+    df = df.drop(columns=["Key"])
+    df["DOB"] = df["DOB"].apply(pd.to_datetime)
+    df["Debut"] = [pd.to_datetime(str(x).replace("*", "")) for x in df["Debut"]]
+    if full_historical_data == True:
+        full_player_DOB_Debuts = df[["Name", "DOB", "Debut"]]
+        return full_player_DOB_Debuts
+    else:
+        full_player_DOB_Debuts = df[["Name", "DOB", "Debut"]][
+            df["Debut"] > "2000-01-01"
+        ].reset_index(drop=True)
+        return full_player_DOB_Debuts
+
+
 def getFullPlayerStats(year: int):
     player_stats = pd.read_html(f"https://afltables.com/afl/stats/{year}.html")
     clean_dfs = []
