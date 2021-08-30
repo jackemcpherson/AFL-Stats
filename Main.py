@@ -1,6 +1,54 @@
 import pandas as pd
 
 
+def getAllResults():
+    # Returns a dataframe containing all AFL match results for all time.
+    df = pd.read_fwf(
+        "https://afltables.com/afl/stats/biglists/bg3.txt",
+        widths=[7, 17, 5, 18, 17, 18, 18, 18],
+        skiprows=1,
+    )
+    df.columns = [
+        "Key",
+        "Date",
+        "Round",
+        "Home",
+        "Home_Score",
+        "Away",
+        "Away_Score",
+        "Venue",
+    ]
+    df = df.drop(columns="Key")
+
+    df["Home_G"] = [int(x.split(".")[0]) for x in df["Home_Score"]]
+    df["Home_B"] = [int(x.split(".")[1]) for x in df["Home_Score"]]
+    df["Home_Score"] = [int(x.split(".")[2]) for x in df["Home_Score"]]
+
+    df["Away_G"] = [int(x.split(".")[0]) for x in df["Away_Score"]]
+    df["Away_B"] = [int(x.split(".")[1]) for x in df["Away_Score"]]
+    df["Away_Score"] = [int(x.split(".")[2]) for x in df["Away_Score"]]
+
+    df["Year"] = [pd.to_datetime(x).date().year for x in df["Date"]]
+
+    df = df[
+        [
+            "Date",
+            "Year",
+            "Round",
+            "Home",
+            "Home_G",
+            "Home_B",
+            "Home_Score",
+            "Away",
+            "Away_G",
+            "Away_B",
+            "Away_Score",
+            "Venue",
+        ]
+    ]
+    return full_results
+
+
 def getFullPlayerStats(year: int):
     player_stats = pd.read_html(f"https://afltables.com/afl/stats/{year}.html")
     clean_dfs = []
