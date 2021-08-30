@@ -4,7 +4,7 @@ Slowly building a great AFL Stats python package.
 
 ## Currently Supports
 
-- Scraping [ALF Tables](https://afltables.com/afl/afl_index.html) for player stats.
+- Scraping [AFL Tables](https://afltables.com/afl/afl_index.html) for player stats.
 - Applying [HPN Footy's player rating algo](https://www.hpnfooty.com/?p=21810) to the scraped stats.
 
 ## Short Term Goals
