@@ -89,7 +89,28 @@ def getFullPlayerStats(year: int):
         x = x.rename(columns={"": "Team"})[:-1]
         clean_dfs.append(x)
     full_player_stats = (pd.concat(clean_dfs)).fillna(0).reset_index(drop=True)
+    full_player_stats["Player"] = [
+        " ".join([x.split(", ")[1], x.split(", ")[0]])
+        for x in full_player_stats["Player"]
+    ]
+    full_player_stats = addAgeColumns(full_player_stats, year)
     return full_player_stats
+
+
+def addAgeColumns(season_df, year):
+    # Adds DOB, Debut, Age, and Career Age columns to output for getFullPlayerStats
+
+    DOB_df = getAllDOBAndDebuts()
+    season_df = season_df.merge(DOB_df, left_on="Player", right_on="Name")
+    cd = pd.to_datetime(f"31-12-{year}")
+    season_df["Age"] = [
+        (cd.year - born.year - ((cd.month, cd.day) < (born.month, born.day)))
+        for born in season_df["DOB"]
+    ]
+    season_df["Career_Age"] = [
+        (cd.year - debut.year) + 1 for debut in season_df["Debut"]
+    ]
+    return season_df
 
 
 def getPlayerRankings(year: int, include_full_stats: bool = False):
