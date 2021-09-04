@@ -1,58 +1,23 @@
 import pandas as pd
 
 
-def getAllResults(full_historical_data: bool = False):
-    # Returns a dataframe containing all AFL match results for all time.
-    # Defaults to debuts after 2000 unless overridden using the full_historical_data flag.
+def getFullPlayerStats(year: int):
+    # Returns a Dataframe containing all player stat totals for the specified year.
 
-    df = pd.read_fwf(
-        "https://afltables.com/afl/stats/biglists/bg3.txt",
-        widths=[7, 17, 5, 18, 17, 18, 18, 18],
-        skiprows=1,
-    )
-    df.columns = [
-        "Key",
-        "Date",
-        "Round",
-        "Home",
-        "Home_Score",
-        "Away",
-        "Away_Score",
-        "Venue",
+    player_stats = pd.read_html(f"https://afltables.com/afl/stats/{year}.html")
+    clean_dfs = []
+    for x in player_stats[1:]:
+        x["team"] = str(x.columns[0][0]).split(" [")[0]
+        x.columns = x.columns.droplevel(0)
+        x = x.rename(columns={"": "Team"})[:-1]
+        clean_dfs.append(x)
+    full_player_stats = (pd.concat(clean_dfs)).fillna(0).reset_index(drop=True)
+    full_player_stats["Player"] = [
+        " ".join([x.split(", ")[1], x.split(", ")[0]])
+        for x in full_player_stats["Player"]
     ]
-    df = df.drop(columns="Key")
-
-    df["Home_G"] = [int(x.split(".")[0]) for x in df["Home_Score"]]
-    df["Home_B"] = [int(x.split(".")[1]) for x in df["Home_Score"]]
-    df["Home_Score"] = [int(x.split(".")[2]) for x in df["Home_Score"]]
-
-    df["Away_G"] = [int(x.split(".")[0]) for x in df["Away_Score"]]
-    df["Away_B"] = [int(x.split(".")[1]) for x in df["Away_Score"]]
-    df["Away_Score"] = [int(x.split(".")[2]) for x in df["Away_Score"]]
-
-    df["Year"] = [pd.to_datetime(x).date().year for x in df["Date"]]
-
-    full_results = df[
-        [
-            "Date",
-            "Year",
-            "Round",
-            "Home",
-            "Home_G",
-            "Home_B",
-            "Home_Score",
-            "Away",
-            "Away_G",
-            "Away_B",
-            "Away_Score",
-            "Venue",
-        ]
-    ]
-    if full_historical_data == True:
-        return full_results
-    else:
-        full_results = full_results[full_results["Year"] >= 2000].reset_index(drop=True)
-        return full_results
+    full_player_stats = addAgeColumns(full_player_stats, year)
+    return full_player_stats
 
 
 def getAllDOBAndDebuts(full_historical_data: bool = False):
@@ -76,25 +41,6 @@ def getAllDOBAndDebuts(full_historical_data: bool = False):
             df["Debut"] > "2000-01-01"
         ].reset_index(drop=True)
         return full_player_DOB_Debuts
-
-
-def getFullPlayerStats(year: int):
-    # Returns a Dataframe containing all player stat totals for the specified year.
-
-    player_stats = pd.read_html(f"https://afltables.com/afl/stats/{year}.html")
-    clean_dfs = []
-    for x in player_stats[1:]:
-        x["team"] = str(x.columns[0][0]).split(" [")[0]
-        x.columns = x.columns.droplevel(0)
-        x = x.rename(columns={"": "Team"})[:-1]
-        clean_dfs.append(x)
-    full_player_stats = (pd.concat(clean_dfs)).fillna(0).reset_index(drop=True)
-    full_player_stats["Player"] = [
-        " ".join([x.split(", ")[1], x.split(", ")[0]])
-        for x in full_player_stats["Player"]
-    ]
-    full_player_stats = addAgeColumns(full_player_stats, year)
-    return full_player_stats
 
 
 def addAgeColumns(season_df, year):

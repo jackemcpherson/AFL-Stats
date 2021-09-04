@@ -1,4 +1,4 @@
-from Main import *
+from Player_Stats import *
 
 
 def buildFullCleanDataframe(year: int):
@@ -43,10 +43,9 @@ def buildFullCleanDataframe(year: int):
             "DEF_Score",
         ]
     ]
-    return df
+    df.to_csv(f"Season {season}.csv")
 
 
 if __name__ == "__main__":
     season = input("Year: ")
-    df = buildFullCleanDataframe(season)
-    df.to_csv(f"Season {season}.csv")
+    buildFullCleanDataframe(season)
