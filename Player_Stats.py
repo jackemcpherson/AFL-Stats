@@ -20,6 +20,22 @@ def getFullPlayerStats(year: int):
     return full_player_stats
 
 
+def getHeightsAndWeights(url: str):
+    # Returns tuple of players height in cm, and weight in kg.
+
+    r = req.get(url)
+
+    height_raw = re.findall("(?<=Height:)(.*)(?= cm)", r.text)[0]
+    numeric_filter = filter(str.isdigit, height_raw)
+    height = int("".join(numeric_filter))
+
+    weight_raw = re.findall("(?<=Weight:)(.*)(?= kg)", r.text)[0]
+    numeric_filter = filter(str.isdigit, weight_raw)
+    weight = int("".join(numeric_filter))
+
+    return height, weight
+
+
 def getAllDOBAndDebuts(full_historical_data: bool = False):
     # Returns a Dataframe containing all players by name, DOB, and debut date.
     # Defaults to debuts after 2000 unless overridden using the full_historical_data flag.
