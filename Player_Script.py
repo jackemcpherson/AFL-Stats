@@ -1,4 +1,4 @@
-from Player_Stats import *
+from Player_Stats import getPlayerRankings
 
 
 def buildFullCleanDataframe(year: int):
